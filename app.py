@@ -2,6 +2,7 @@ from flask import Flask, render_template, Response
 import cv2
 
 import threading
+import datetime
 import time
 
 app = Flask(__name__)
@@ -11,10 +12,19 @@ camera_frame = None
 
 def generate_frames():
     global camera_frame
-    print("Thread started")
     vs = cv2.VideoCapture(0)
     while True:
         ret, frame = vs.read()
+        dt = datetime.datetime.now()
+        dt_text = dt.strftime("%Y.%m.%d %H:%M:%S")
+        frame = cv2.putText(img=frame,
+                            text=dt_text,
+                            org=(5, 20),
+                            fontFace=cv2.FONT_HERSHEY_SIMPLEX,
+                            fontScale=0.5,
+                            color=(255, 255, 255),
+                            thickness=1,
+                            lineType=cv2.LINE_AA)
         ret, jpeg = cv2.imencode('.jpg', frame)
         frame = jpeg.tobytes()
         camera_frame = (b'--frame\r\n'
