@@ -1,4 +1,4 @@
-from flask import Flask, render_template, Response
+from flask import Flask, render_template, send_file, Response
 import cv2
 
 import threading
@@ -27,7 +27,7 @@ def generate_frames():
                 frame = cv2.rotate(frame, cv2.ROTATE_180)
             elif configs["rotate"] == 270:
                 frame = cv2.rotate(frame, cv2.ROTATE_90_COUNTERCLOCKWISE)
-        
+
         flip_vertically = "flip_vertically" in configs.keys() and configs["flip_vertically"]
         flip_horizontally = "flip_horizontally" in configs.keys() and configs["flip_horizontally"]
         if flip_vertically and flip_horizontally:
@@ -47,12 +47,12 @@ def generate_frames():
                             color=(255, 255, 255),
                             thickness=1,
                             lineType=cv2.LINE_AA)
-        
+
         ret, jpeg = cv2.imencode('.jpg', frame)
         frame = jpeg.tobytes()
         camera_frame = (b'--frame\r\n'
                         b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
-        
+
         time.sleep(0.1)
 
 
@@ -79,6 +79,10 @@ def index():
 def video_feed():
     return Response(get_frame(),
                     mimetype='multipart/x-mixed-replace; boundary=frame')
+
+@app.route('/favicon.ico')
+def favicon():
+    return send_file('static/img/favicon.ico')
 
 
 if __name__ == '__main__':
