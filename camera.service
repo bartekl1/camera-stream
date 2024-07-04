@@ -1,0 +1,14 @@
+# /etc/systemd/system/camera.service
+
+[Unit]
+Description=Camera Stream
+After=network.target
+
+[Service]
+WorkingDirectory=<PATH>
+ExecStart=/usr/bin/python3 <PATH>/app.py
+Restart=always
+User=<USERNAME>
+
+[Install]
+WantedBy=multi-user.target
