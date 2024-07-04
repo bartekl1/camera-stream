@@ -64,8 +64,9 @@ def get_frame():
         time.sleep(0.1)
 
 
-@app.before_first_request
+@app.before_request
 def start_thread():
+    app.before_request_funcs[None].remove(start_thread)
     generator_thread = threading.Thread(target=generate_frames)
     generator_thread.start()
 
@@ -80,9 +81,15 @@ def video_feed():
     return Response(get_frame(),
                     mimetype='multipart/x-mixed-replace; boundary=frame')
 
+
 @app.route('/favicon.ico')
 def favicon():
     return send_file('static/img/favicon.ico')
+
+
+@app.route('/manifest.json')
+def manifest():
+    return send_file('static/manifest.json')
 
 
 if __name__ == '__main__':
